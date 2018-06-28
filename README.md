@@ -92,6 +92,9 @@ paper.zpd(function (err, paper) {
 #### touch
 
     true or false: enable or disable touch support (default true)
+    
+#### jailToViewport
+    true or false: only allow drag and pan of the object in the viewport boundaries (default false)
 
 ### More
 
