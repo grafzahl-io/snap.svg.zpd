@@ -753,6 +753,80 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
         };
 
         /**
+         * moves the element to the center
+         * of the canvas
+         */
+        var panToCenter = function(interval, ease, cb) {
+
+            // get a reference to the current element
+            var self = this;
+
+            // check if we have this element in our zpd data storage
+            if (snapsvgzpd.dataStore.hasOwnProperty(self.id)) {
+
+                var zpdElement = snapsvgzpd.dataStore[self.id].element;
+                var zpdContainer = snapsvgzpd.dataStore[self.id];
+
+                var x = zpdContainer.data.root.clientWidth / 2 - zpdElement.node.getBoundingClientRect().width / 2;
+                var y = zpdContainer.data.root.clientHeight / 2 - zpdElement.node.getBoundingClientRect().height / 2;
+
+                var gMatrix = zpdElement.node.getCTM(),
+                    matrixX = _increaseDecreaseOrNumber(gMatrix.e, x),
+                    matrixY = _increaseDecreaseOrNumber(gMatrix.f, y),
+                    matrixString = "matrix(" + gMatrix.a + "," + gMatrix.b + "," + gMatrix.c + "," + gMatrix.d + "," + matrixX + "," + matrixY + ")";
+
+                // dataStore[me.id].transform(matrixString); // load <g> transform matrix
+                zpdElement.animate({ transform: matrixString }, interval || 10, ease || null, function () {
+                    if (cb) {
+                        cb(null, zpdElement);
+                    }
+                });
+
+            }
+        };
+
+        /**
+         * zooms the element to fit the 
+         * canvas viewport
+         */
+        var zoomToFitViewport = function(margin = 0, interval, ease, callbackFunction) {
+
+            // get a reference to the current element
+            var self = this;
+
+            // check if we have this element in our zpd data storage
+            if (snapsvgzpd.dataStore.hasOwnProperty(self.id)) {
+
+                var zpdElement = snapsvgzpd.dataStore[self.id].element;
+                var zpdContainer = snapsvgzpd.dataStore[self.id];
+                var includeMargin = parseInt(margin) * 2;
+                var currentTransformMatrix = zpdElement.node.getTransformToElement(rootSvgObject);
+                var currentZoom = currentTransformMatrix.a;
+
+                if(zpdContainer.data.root.clientWidth > zpdElement.node.getBoundingClientRect().width) {
+                    var orignalSizeViewPortFactor = (parseInt(zpdContainer.data.root.clientWidth) - includeMargin)
+                            / parseInt(zpdElement.node.getBoundingClientRect().width);
+                } else {
+                    var orignalSizeViewPortFactor = (parseInt(zpdContainer.data.root.clientHeight) - includeMargin)
+                            / parseInt(zpdElement.node.getBoundingClientRect().height);
+                }
+
+                // add new scaling
+                currentTransformMatrix.a = orignalSizeViewPortFactor;
+                currentTransformMatrix.d = orignalSizeViewPortFactor;
+
+                // apply transformation to our element
+                zpdElement.node.setAttribute('transform', _getSvgMatrixAsString(currentTransformMatrix));
+
+                return {
+                    minZoom: orignalSizeViewPortFactor,
+                    maxZoom: orignalSizeViewPortFactor * 4,
+                    currentZoom: orignalSizeViewPortFactor
+                }
+            }
+        };
+
+        /**
          * rotate the element to a certain rotation
          */
         var rotate = function (a, x, y, interval, ease, cb) {
@@ -787,11 +861,9 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
         Paper.prototype.zpd = zpd;
         Paper.prototype.zoomTo = zoomTo;
         Paper.prototype.panTo = panTo;
+        Paper.prototype.panToCenter = panToCenter;
         Paper.prototype.rotate = rotate;
-
-        /** More Features to add (click event) help me if you can **/
-        // Element.prototype.panToCenter = panToCenter; // arg (ease, interval, cb)
-
+        Paper.prototype.zoomToFitViewport = zoomToFitViewport;
 
         /** UI for zpdr **/
 
