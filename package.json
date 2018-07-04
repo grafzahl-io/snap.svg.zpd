@@ -1,7 +1,7 @@
 {
   "name": "snap.svg.zpd",
-  "version": "0.0.11",
-  "description": "A zoom/pan/drag plugin for Snap.svg",
+  "version": "0.0.12",
+  "description": "A zoom/pan/drag plugin for Snap.svg with extended functions",
   "main": "snap.svg.zpd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
