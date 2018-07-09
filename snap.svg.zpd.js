@@ -398,6 +398,8 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
 
                 if (!snapsvgzpd.enable) return;
 
+                if (zpdElement.mouseIsOutside) return;
+
                 event.returnValue = false;
 
                 var g = zpdElement.element.node;
@@ -424,6 +426,16 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
 
                     zpdElement.data.stateOrigin = dragPoint;
                 }
+            };
+
+            var handleMouseLeave = function handleMouseLeave (event) {
+    console.log("outside!")
+                zpdElement.data.state = '';
+                zpdElement.mouseIsOutside = true;
+            };
+
+            var handleMouseEnter = function handleMouseEnter (event) {
+                zpdElement.mouseIsOutside = false;
             };
 
             var handleMouseWheel = function handleMouseWheel (event) {
@@ -473,7 +485,9 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
                 "mouseUp": handleMouseUp,
                 "mouseDown": handleMouseDown,
                 "mouseMove": handleMouseMove,
-                "mouseWheel": handleMouseWheel
+                "mouseWheel": handleMouseWheel,
+                "mouseLeave": handleMouseLeave,
+                "mouseEnter": handleMouseEnter,
             };
         };
 
@@ -494,6 +508,8 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
                 svgElement.addEventListener('mouseup', handlerFunctions.mouseUp, false);
                 svgElement.addEventListener('mousedown', handlerFunctions.mouseDown, false);
                 svgElement.addEventListener('mousemove', handlerFunctions.mouseMove, false);
+                svgElement.addEventListener('mouseleave', handlerFunctions.mouseLeave, false);
+                svgElement.addEventListener('mouseenter', handlerFunctions.mouseEnter, false);
 
                 if (navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 ||
                     navigator.userAgent.toLowerCase().indexOf('trident') >= 0) {
@@ -514,6 +530,8 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
             svgElement.removeEventListener('mouseup', handlerFunctions.mouseUp, false);
             svgElement.removeEventListener('mousedown', handlerFunctions.mouseDown, false);
             svgElement.removeEventListener('mousemove', handlerFunctions.mouseMove, false);
+            svgElement.removeEventListener('mouseleave', handlerFunctions.mouseLeave, false);
+            svgElement.removeEventListener('mouseenter', handlerFunctions.mouseEnter, false);
 
             if (navigator.userAgent.toLowerCase().indexOf('webkit') >= 0 ||
                 navigator.userAgent.toLowerCase().indexOf('trident') >= 0) {
